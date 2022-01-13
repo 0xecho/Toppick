@@ -1,0 +1,21 @@
+@startuml sequence_diagram_search
+
+title 
+Sequence Diagram Search
+end title
+
+/' This website is a top picks website. It keeps track of your top picks in a particular category like movies, music, or video games. Initially it will only have the movies.
+Users can register and login to the website. Registration is free. Users register using telegram login which allows for the user to login to the website using their telegram account plus phone number is verified for the user. Users can set their username in the website. Users can have a publically shareable url to their top picks. Users can opt out of sharing their top picks in the settings. 
+Once a user has registered, they have no selected movies yet. 
+They can head to the select movies page and select movies they have watched by searching for them and labeling them as seen.
+Additionally, they can add movies by going to the random movie page. On the random movie page, they are presented with a random movie. The can swipe left or right to label the movie as seen or not seen. 
+Users need label at least 10 movies to be able to rank their picks.
+Users can rank their picks by going to the rank page. On the rank page, they are presented with two random movies from the list.
+Movie list is being pulled from the OMDb API. For every movie that is pulled from the OMDB API, save it to the local database for future use.
+Users can view their top picks by going to the top picks page. On the top picks page, they are presented with a list of their top picks. Users can sort their top picks, filter their top picks, search their top picks, export their top picks, import their top picks, and delete their top picks.
+ '/
+
+User -> Controller: search movie with title, genre and year
+Controller -> User: return movie list
+User -> Controller: mark movie as seen
+Controller -> User: return ok
