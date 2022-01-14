@@ -7,4 +7,4 @@ class CustomUser(AbstractUser):
     is_public = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.email
+        return self.telegram_username or self.username

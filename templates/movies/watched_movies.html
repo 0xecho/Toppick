@@ -1,0 +1,39 @@
+{% extends '_base.html' %}
+
+{% block title %}Watched Movies{% endblock %}
+
+{% block content %}
+
+<h3>Watched Movies</h3>
+
+<!-- container, cards insied container, movies with title, image and year -->
+<div class="container">
+  <div class="row">
+    {% if movies|length > 0 %}
+        {% for movie in movies %}
+        <div class="col-md-4">
+            <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center">{{ movie.title }}</h5>
+                <img src="/media/{{ movie.poster }}" class="img-fluid">
+                <br>
+                <!-- oops haven't watched it yet -->
+            <a href="{% url 'unsee' movie.id %}" class="btn btn-outline-danger btn-block">Oops, haven't seen this yet</a>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-center">No movies found</h5>
+            </div>
+            </div>
+        </div>
+    {% endif %}
+
+  </div>
+</div>
+    
+{% endblock %}
