@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.db import models
 
 from accounts.models import CustomUser
@@ -5,7 +6,8 @@ from accounts.models import CustomUser
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     year = models.IntegerField()
-    poster = models.ImageField(upload_to='posters/')
+    # poster = models.ImageField(upload_to='posters/')
+    poster = models.URLField()
     score = models.IntegerField(default=0)
 
     def __str__(self):

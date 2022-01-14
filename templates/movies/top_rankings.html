@@ -21,13 +21,13 @@
             </div>
             <div class="card-body">
                 <h5 class="card-title text-center">{{ movie.title }}</h5>
-                <div class="text-center">
+                <!-- <div class="text-center">
                     Genres: 
                     {% for genre in movie.genre_set.all %}
                     {{ genre.name }}
                     {% endfor %}
-                </div>
-                <img src="/media/{{ movie.poster }}" class="img-thumbnail img-fluid card-img-top">
+                </div> -->
+                <img src="{{ movie.poster }}" class="img-thumbnail img-fluid card-img-top">
             </div>
         </div>
         <div class="col-md-3"></div>

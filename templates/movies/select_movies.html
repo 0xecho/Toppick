@@ -13,16 +13,16 @@
       <div class="card-body">
         <form class="form-inline" method="GET">
             <input type="hidden" name="q" value="{{q}}">
-          <div class="form-group">
-            <label for="genre">Genre</label>
-            &nbsp;
-            <select class="form-control" id="genre" name="genre">
+          <!-- <div class="form-group"> -->
+            <!-- <label for="genre">Genre</label> -->
+            <!-- &nbsp; -->
+            <!-- <select class="form-control" id="genre" name="genre">
               <option value="">Any</option>
               {% for genre in genres %}
                 <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>{{ genre.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+              {% endfor %} -->
+            <!-- </select> -->
+          <!-- </div> -->
           <div class="form-group my-3">
             <label for="year">Year</label>
             &nbsp;
@@ -51,7 +51,7 @@
                 <div class="card">
                     <div class="card-body">
                     <h5 class="card-title text-center">{{ movie.title }}</h5>
-                    <img src="/media/{{ movie.poster }}" class="img-fluid">
+                    <img src="{{ movie.poster }}" class="img-fluid">
                     <br>
                     <!-- mark as seen button oulined -->
                     {% if movie.is_seen %}

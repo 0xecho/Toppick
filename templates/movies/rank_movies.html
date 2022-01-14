@@ -11,10 +11,9 @@
         <div class="col-md-6 border-right">
             <div class="card text-center hover-shadow">
                 <div class="card-body">
-                    <img src="https://picsum.photos/200/300?grayscale" alt="Movie 1">
-                    <h3>Movie 1</h3>
-                    <p>Genres: Action, Comedy</p>
-                    <p>Released: 2019</p>
+                    <img src="{{ movies.0.poster }}" alt="Movie 1">
+                    <h3>{{movies.0.title}}</h3>
+                    <p>Released: {{movies.0.year}}</p>
                     <a href="{% url 'compare' movies.0.id movies.1.id %}" class="stretched-link"></a>
                 </div>
             </div>
@@ -22,10 +21,9 @@
         <div class="col-md-6 text-right">
             <div class="card text-center hover-shadow">
                 <div class="card-body">
-                    <img src="https://picsum.photos/200/300?grayscale" alt="Movie 2">
-                    <h3>Movie 2</h3>
-                    <p>Genres: Action, Comedy</p>
-                    <p>Released: 2019</p>
+                    <img src="{{ movies.1.poster }}" alt="Movie 2">
+                    <h3>{{movies.1.title}}</h3>
+                    <p>Released: {{movies.1.year}}</p>
                     <a href="{% url 'compare' movies.1.id movies.0.id %}" class="stretched-link"></a>
                 </div>
             </div>

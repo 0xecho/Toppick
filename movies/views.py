@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from typing import Any, Dict
 from itertools import permutations
+import requests
+import random
 
 from . import models
 from .authentication import verify_auth
@@ -40,17 +42,40 @@ class SelectMoviesView(LoginRequiredMixin, generic.TemplateView):
         if not query:
             return redirect(reverse_lazy('home'))
         
-        genre = request.GET.get('genre')
+        # genre = request.GET.get('genre')
         year = request.GET.get('year')
+        try:
+            API_URL = f"http://www.omdbapi.com/?apikey=b38a0c33&s={query}"  
+        except:
+            # Internal server error, notify user
+            return redirect(reverse_lazy('home'))
+        resp = requests.get(API_URL)
+        data = resp.json()
+        for row in data['Search']:
+            print(row)
+            try:
+                try:
+                    row_year = int(row['Year'].split('–')[0])
+                except:
+                    row_year = 0
+
+                new_movie = models.Movie.objects.get_or_create(
+                    title=row['Title'],
+                    year=row_year,
+                    poster=row['Poster'],
+                )
+                if new_movie[0].poster == 'N/A':
+                    resp = requests.get(f"http://www.omdbapi.com/?apikey=b38a0c33&t={row['Title']}")
+                    data = resp.json()
+                    new_movie[0].poster = data['Poster']
+                    new_movie[0].save()
+
+            except Exception as e:
+                print(e)
+                pass
         
         movies = models.Movie.objects.filter(title__icontains=query)
-        # filter out movies that are seen from table MovieSeen
-        # movies = movies.exclude(id__in=models.MovieSeen.objects.filter(user=request.user).values_list('movie_id', flat=True))
-        if genre:
-            kwargs['selected_genre'] = genre
-            genre = models.Genre.objects.filter(name=genre).first()
-            movies = movies.filter(genre=genre)
-
+        print("MOVIES:", movies)
         if year:
             kwargs['selected_year'] = year
             movies = movies.filter(year=year)
@@ -65,7 +90,7 @@ class SelectMoviesView(LoginRequiredMixin, generic.TemplateView):
         kwargs['movies'] = movies
         kwargs['q'] = query
         kwargs['years'] = map(str, movies.values_list('year', flat=True).distinct())
-        kwargs['genres'] = models.Genre.objects.all()
+        # kwargs['genres'] = models.Genre.objects.all()
         return super().get(request, *args, **kwargs)
 
 class WatchedMoviesView(LoginRequiredMixin, generic.TemplateView):
@@ -82,6 +107,8 @@ class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         # select 2 random movies from table MovieSeen that are not in table MovieComparision and return in context
         seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
+        seen_movies = list(seen_movies)
+        random.shuffle(seen_movies)
         kwargs['movies'] = False
         for movie_1, movie_2 in permutations(seen_movies, 2):
             if models.MovieComparision.objects.filter(better_movie=movie_1, worse_movie=movie_2).exists() or models.MovieComparision.objects.filter(better_movie=movie_2, worse_movie=movie_1).exists():
