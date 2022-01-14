@@ -1,0 +1,38 @@
+{% extends '_base.html' %}
+
+{% block title %}Top Movies{% endblock %}
+
+{% block content %}
+
+<!-- A top 10 ranking list of movies with rank, title: score, image, genres and year -->
+<!-- each row has one card -->
+<h3>Top Movies</h3>
+<div >   
+    <!-- center cards -->
+    {% for movie in movies %}
+    <div class="row">
+
+        <div class="col-md-3"></div>
+        <div class="card col-md-6">
+            <div class="card-title text-center">
+                <h4>
+                    Rank: {{ forloop.counter }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title text-center">{{ movie.title }}</h5>
+                <div class="text-center">
+                    Genres: 
+                    {% for genre in movie.genre_set.all %}
+                    {{ genre.name }}
+                    {% endfor %}
+                </div>
+                <img src="/media/{{ movie.poster }}" class="img-thumbnail img-fluid card-img-top">
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
