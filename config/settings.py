@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # GENERAL
@@ -83,11 +84,11 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'toppicks_db',
-        'USER': 'toppicks_user',
-        'PASSWORD': 'toppicks_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME') or 'toppicks_db',
+        'USER': os.environ.get('DB_USER') or 'toppicks_user',
+        'PASSWORD': os.environ.get('DB_PASSWORD') or 'toppicks_password',
+        'HOST': os.environ.get('DB_HOST') or 'localhost',
+        'PORT': os.environ.get('DB_PORT') or '5432',
     }
 }
 
