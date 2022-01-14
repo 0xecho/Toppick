@@ -1,0 +1,67 @@
+{% extends '_base.html' %}
+
+{% block title %}Select Movies{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-header">
+        <h4>Filters</h4>
+      </div>
+      <div class="card-body">
+        <form class="form-inline" method="GET">
+            <input type="hidden" name="q" value="{{q}}">
+          <div class="form-group">
+            <label for="genre">Genre</label>
+            &nbsp;
+            <select class="form-control" id="genre" name="genre">
+              <option value="">Any</option>
+              {% for genre in genres %}
+                <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>{{ genre.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group my-3">
+            <label for="year">Year</label>
+            &nbsp;
+            <select class="form-control" id="year" name="year">
+              <option value="">Any</option>
+              {% for year in years %}
+                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        <h4>Movies</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for movie in movies %}
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title text-center">{{ movie.title }}</h5>
+                <img src="/media/{{ movie.poster }}" class="img-fluid">
+                <br>
+                <!-- mark as seen button oulined -->
+                <a href="#SEEN" class="btn btn-outline-primary btn-block">Mark Seen</a>
+
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+
+{% endblock content %}

@@ -13,14 +13,14 @@ class Movie(models.Model):
 
 class Director(models.Model):
     name = models.CharField(max_length=255)
-    movies = models.ManyToManyField(Movie)
+    movies = models.ManyToManyField(Movie, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 class Genre(models.Model):
     name = models.CharField(max_length=255)
-    movies = models.ManyToManyField(Movie)
+    movies = models.ManyToManyField(Movie, null=True, blank=True)
 
     def __str__(self):
         return self.name
