@@ -30,7 +30,6 @@ Users can view their top picks by going to the top picks page. On the top picks 
 Pages needed:
 * Home page: Basic description and how to on how the site works.
 * Login page: Login page for users. Login using telegram.
-* Register page: Register page for users.
 * Select movies page: Page for users to select movies they haven't watched yet.
 * Random movie page: Page for users to select a random movie they haven't watched yet.
 * Rank page: Page for users to rank their picks.
