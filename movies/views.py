@@ -1,13 +1,12 @@
-from functools import reduce
-from shutil import move
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.http import JsonResponse
 from django.views import generic
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from typing import Any, Dict
+from itertools import permutations
 
 from . import models
 from .authentication import verify_auth
@@ -33,7 +32,7 @@ class TelegramLoginHandlerView(generic.View):
             return redirect(reverse_lazy('home'))
         return redirect(reverse_lazy('telegram_login'))
 
-class SelectMoviesView(generic.TemplateView):
+class SelectMoviesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'movies/select_movies.html'
 
     def get(self, request, *args, **kwargs):
@@ -69,11 +68,35 @@ class SelectMoviesView(generic.TemplateView):
         kwargs['genres'] = models.Genre.objects.all()
         return super().get(request, *args, **kwargs)
 
-class WatchedMoviesView(generic.TemplateView):
+class WatchedMoviesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'movies/watched_movies.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        kwargs['movies'] = map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=self.request.user))
+        kwargs['movies'] = list(map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=self.request.user)))
+        print(kwargs['movies'])
+        return super().get_context_data(**kwargs)
+
+class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'movies/rank_movies.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        # select 2 random movies from table MovieSeen that are not in table MovieComparision and return in context
+        seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
+        kwargs['movies'] = False
+        for movie_1, movie_2 in permutations(seen_movies, 2):
+            if models.MovieComparision.objects.filter(better_movie=movie_1, worse_movie=movie_2).exists() or models.MovieComparision.objects.filter(better_movie=movie_2, worse_movie=movie_1).exists():
+                continue
+            kwargs['movies'] = [models.Movie.objects.get(id=movie_1), models.Movie.objects.get(id=movie_2)]
+            break
+        return super().get_context_data(**kwargs)
+    
+class TopRankingsView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'movies/top_rankings.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        # get all seenmovies from movieseen, take the movies and sort them by their score, return the top 10
+        seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
+        kwargs['movies'] = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')[:10]
         return super().get_context_data(**kwargs)
 
 @login_required
@@ -90,3 +113,18 @@ def unsee(request, movie_id):
     movie = models.Movie.objects.get(id=movie_id)
     models.MovieSeen.objects.filter(user=request.user, movie=movie).delete()
     return redirect(reverse_lazy('watched_movies'))
+
+@login_required
+def compare(request, better_movie_id, worse_movie_id):
+    better_movie = models.Movie.objects.get(id=better_movie_id)
+    worse_movie = models.Movie.objects.get(id=worse_movie_id)
+    models.MovieComparision.objects.get_or_create(
+        better_movie=better_movie,
+        worse_movie=worse_movie,
+        user=request.user
+    )
+    better_movie.score += 1
+    worse_movie.score -= 1
+    better_movie.save()
+    worse_movie.save()
+    return redirect(reverse_lazy('rank_movies'))

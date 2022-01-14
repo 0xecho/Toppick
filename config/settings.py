@@ -178,3 +178,4 @@ LOGOUT_REDIRECT_URL = 'home'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
+LOGIN_URL = 'telegram_login'

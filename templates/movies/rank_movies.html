@@ -1,0 +1,57 @@
+{% extends '_base.html' %}
+
+{% block title %}Select Movies{% endblock %}
+
+{% block content %}
+
+<!-- A div split left and right with a vertical separator showing only one card each -->
+<div>
+    {% if movies %}
+    <div class="row">
+        <div class="col-md-6 border-right">
+            <div class="card text-center hover-shadow">
+                <div class="card-body">
+                    <img src="https://picsum.photos/200/300?grayscale" alt="Movie 1">
+                    <h3>Movie 1</h3>
+                    <p>Genres: Action, Comedy</p>
+                    <p>Released: 2019</p>
+                    <a href="{% url 'compare' movies.0.id movies.1.id %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-right">
+            <div class="card text-center hover-shadow">
+                <div class="card-body">
+                    <img src="https://picsum.photos/200/300?grayscale" alt="Movie 2">
+                    <h3>Movie 2</h3>
+                    <p>Genres: Action, Comedy</p>
+                    <p>Released: 2019</p>
+                    <a href="{% url 'compare' movies.1.id movies.0.id %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <strong>Select a few more movies you've seen. You have ranked every one!</strong>
+    </div>  
+    {% endif %}
+</div>
+
+<style>
+    .card{
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+      transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+  padding: 14px 80px 18px 36px;
+  cursor: pointer;
+}
+
+.card:hover{
+     transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+}
+</style>
+
+{% endblock content %}

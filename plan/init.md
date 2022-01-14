@@ -33,10 +33,10 @@ Pages needed:
 * Select movies page: Page for users to select movies they haven't watched yet.
     - Search for movies
     - Label movies as seen
-* Random movie page: Page for users to select a random movie they haven't watched yet.
+* Watched movies page: Page for users to view their watched movies.
 * Rank page: Page for users to rank their picks.
 * Top picks page: Page for users to view their top picks.
-* Watched movies page: Page for users to view their watched movies.
+* Random movie page: Page for users to select a random movie they haven't watched yet.
 * Settings page: Page for users to modify their settings.
 
 

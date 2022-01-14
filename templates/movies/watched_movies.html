@@ -15,10 +15,10 @@
             <div class="card">
             <div class="card-body">
                 <h5 class="card-title text-center">{{ movie.title }}</h5>
-                <img src="/media/{{ movie.poster }}" class="img-fluid">
+                <img src="/media/{{ movie.poster }}" class="img-fluid card-img-top">
                 <br>
                 <!-- oops haven't watched it yet -->
-            <a href="{% url 'unsee' movie.id %}" class="btn btn-outline-danger btn-block">Oops, haven't seen this yet</a>
+            <a href="{% url 'unsee' movie.id %}" class="btn btn-outline-danger btn-block">Mark not seen</a>
             </div>
             </div>
         </div>
@@ -32,8 +32,14 @@
             </div>
         </div>
     {% endif %}
-
-  </div>
 </div>
-    
+</div>
+
+<style>
+.card-img-top {
+    width: 100%;
+    height: 15vw;
+    object-fit: cover;
+}
+</style>
 {% endblock %}
