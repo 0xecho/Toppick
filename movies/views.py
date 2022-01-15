@@ -117,14 +117,18 @@ class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
             break
         return super().get_context_data(**kwargs)
     
-class TopRankingsView(LoginRequiredMixin, generic.TemplateView):
+# paginated view
+# seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
+# ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
+class TopRankingsView(LoginRequiredMixin, generic.ListView):
     template_name = 'movies/top_rankings.html'
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        # get all seenmovies from movieseen, take the movies and sort them by their score, return the top 10
+    paginate_by = 10
+    
+    def get_queryset(self):
         seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
-        kwargs['movies'] = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')[:10]
-        return super().get_context_data(**kwargs)
+        ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
+        return ordered_movies
+
 
 @login_required
 def see(request, movie_id):

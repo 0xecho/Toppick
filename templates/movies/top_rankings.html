@@ -9,15 +9,23 @@
 <h3>Top Movies</h3>
 <div >   
     <!-- center cards -->
-    {% for movie in movies %}
+    {% for movie in page_obj %}
     <div class="row">
 
         <div class="col-md-3"></div>
         <div class="card col-md-6">
-            <div class="card-title text-center">
-                <h4>
-                    Rank: {{ forloop.counter }}
-                </h4>
+            <div class="card-title">
+                <span class="col-sm-6text-left">
+                    <span>
+                        <h4>
+                            Rank: {{ forloop.counter0|add:page_obj.start_index }}
+                            <span class="float-right">
+                                <span class="badge badge-secondary text-right">{{ movie.score }}</span>
+                            </span> 
+                        </h4>
+                    </span>
+                    <!-- add right aligned score -->
+                </span>
             </div>
             <div class="card-body">
                 <h5 class="card-title text-center">{{ movie.title }}</h5>
@@ -33,6 +41,36 @@
         <div class="col-md-3"></div>
     </div>
     {% endfor %}
+    <!-- pagination -->
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'top_movies' %}?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for page in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == page %} active {% endif %}">
+                        <a class="page-link" href="{% url 'top_movies' %}?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'top_movies' %}?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 {% endblock content %}
