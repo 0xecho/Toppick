@@ -128,6 +128,23 @@ class TopRankingsView(LoginRequiredMixin, generic.ListView):
         ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
         return ordered_movies
 
+class PublicTopRankingsView(generic.ListView):
+    template_name = 'movies/public_top_rankings.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        uuid = self.kwargs['uuid']
+        kwargs["user"] = models.CustomUser.objects.get(public_url_uuid=uuid)
+        return super().get_context_data(**kwargs)
+    
+    def get_queryset(self):
+        # get uuid from url and get user from uuid 
+        uuid = self.kwargs['uuid']
+        user = models.CustomUser.objects.get(public_url_uuid=uuid)
+        seen_movies = models.MovieSeen.objects.filter(user=user).values_list('movie__id', flat=True)
+        ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
+        return ordered_movies
+
 
 @login_required
 def see(request, movie_id):
