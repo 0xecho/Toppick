@@ -134,11 +134,10 @@ class PublicTopRankingsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         uuid = self.kwargs['uuid']
-        kwargs["user"] = models.CustomUser.objects.get(public_url_uuid=uuid)
+        kwargs["user_name"] = models.CustomUser.objects.get(public_url_uuid=uuid)
         return super().get_context_data(**kwargs)
     
     def get_queryset(self):
-        # get uuid from url and get user from uuid 
         uuid = self.kwargs['uuid']
         user = models.CustomUser.objects.get(public_url_uuid=uuid)
         seen_movies = models.MovieSeen.objects.filter(user=user).values_list('movie__id', flat=True)
