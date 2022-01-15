@@ -13,6 +13,7 @@ django-debug-toolbar = "==3.2"
 whitenoise = "==5.2.0"
 psycopg2-binary = "*"
 uwsgi = "*"
+random-username = "*"
 
 [requires]
 python_version = "3.8"

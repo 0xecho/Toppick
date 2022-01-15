@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from typing import Any, Dict
 from itertools import permutations
+from random_username.generate import generate_username
 import requests
 import random
 
@@ -25,9 +26,9 @@ class TelegramLoginHandlerView(generic.View):
             user = models.CustomUser.objects.get_or_create(
                 telegram_id=data['id'],
                 defaults={
-                    'username': data['username'],
-                    'first_name': data['first_name'],
-                    'last_name': data['last_name'],
+                    'username': data.get('username', generate_username()),
+                    'first_name': data.get('first_name', ''),
+                    'last_name': data.get('last_name', ''),
                 }
             )[0]
             login(request, user)
