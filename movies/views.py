@@ -10,10 +10,13 @@ from itertools import permutations
 from random_username.generate import generate_username
 import requests
 import random
+import botogram
 
 from . import models
 from .authentication import verify_auth
 # Create your views here.
+
+telegram_bot = botogram.create(settings.TELEGRAM_BOT_TOKEN)
 
 class TelegramLoginView(generic.TemplateView):
     template_name = 'movies/telegram_login.html'
@@ -23,14 +26,22 @@ class TelegramLoginHandlerView(generic.View):
         data = request.GET
         token = settings.TELEGRAM_BOT_TOKEN
         if verify_auth(data, token):
-            user = models.CustomUser.objects.get_or_create(
+            user, created = models.CustomUser.objects.get_or_create(
                 telegram_id=data['id'],
                 defaults={
                     'username': data.get('username', generate_username()),
                     'first_name': data.get('first_name', ''),
                     'last_name': data.get('last_name', ''),
                 }
-            )[0]
+            )
+            if created:
+                telegram_bot.chat(data['id']).send(
+                    f'Welcome to the movies bot, {user.username}!\n'
+                    'You can now use the web interface to rank movies you have seen.'
+                )
+                telegram_bot.chat(settings.TELEGRAM_ADMIN_ID).send(
+                    f'New user @{user.username} - {user.first_name} {user.last_name} - {user.telegram_id} registered.'
+                )
             login(request, user)
             return redirect(reverse_lazy('home'))
         return redirect(reverse_lazy('telegram_login'))
