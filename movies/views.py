@@ -93,13 +93,12 @@ class SelectMoviesView(LoginRequiredMixin, generic.TemplateView):
         # kwargs['genres'] = models.Genre.objects.all()
         return super().get(request, *args, **kwargs)
 
-class WatchedMoviesView(LoginRequiredMixin, generic.TemplateView):
+class WatchedMoviesView(LoginRequiredMixin, generic.ListView):
     template_name = 'movies/watched_movies.html'
+    paginate_by = 9
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        kwargs['movies'] = list(map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=self.request.user)))
-        print(kwargs['movies'])
-        return super().get_context_data(**kwargs)
+    def get_queryset(self):
+        return list(map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=self.request.user)))
 
 class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'movies/rank_movies.html'
