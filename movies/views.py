@@ -125,7 +125,7 @@ class TopRankingsView(LoginRequiredMixin, generic.ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        return models.MovieSeen.objects.filter(user=self.request.user).order_by('-score')
+        return list(map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=self.request.user).order_by('-score')))
 
 class PublicTopRankingsView(generic.ListView):
     template_name = 'movies/public_top_rankings.html'
@@ -139,7 +139,7 @@ class PublicTopRankingsView(generic.ListView):
     def get_queryset(self):
         uuid = self.kwargs['uuid']
         user = models.CustomUser.objects.get(public_url_uuid=uuid)
-        return models.MovieSeen.objects.filter(user=user).order_by('-score')
+        return list(map(lambda movieseen: movieseen.movie, models.MovieSeen.objects.filter(user=user).order_by('-score')))
 
 
 @login_required
