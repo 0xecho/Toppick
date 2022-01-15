@@ -166,8 +166,8 @@ def compare(request, better_movie_id, worse_movie_id):
         worse_movie=worse_movie,
         user=request.user
     )
-    better_movie_seen = models.MovieSeen.get_or_create(user=request.user, movie=better_movie)
-    worse_movie_seen = models.MovieSeen.get_or_create(user=request.user, movie=worse_movie)
+    better_movie_seen = models.MovieSeen.objects.get_or_create(user=request.user, movie=better_movie)
+    worse_movie_seen = models.MovieSeen.objects.get_or_create(user=request.user, movie=worse_movie)
     better_movie_seen[0].score += 1
     worse_movie_seen[0].score -= 1
     better_movie_seen[0].save()
