@@ -8,7 +8,6 @@ class Movie(models.Model):
     year = models.IntegerField()
     # poster = models.ImageField(upload_to='posters/')
     poster = models.URLField()
-    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -30,6 +29,7 @@ class Genre(models.Model):
 class MovieSeen(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.movie.title

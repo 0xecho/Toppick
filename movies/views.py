@@ -124,9 +124,7 @@ class TopRankingsView(LoginRequiredMixin, generic.ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
-        ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
-        return ordered_movies
+        return models.MovieSeen.objects.filter(user=self.request.user).order_by('-score')
 
 class PublicTopRankingsView(generic.ListView):
     template_name = 'movies/public_top_rankings.html'
@@ -140,9 +138,7 @@ class PublicTopRankingsView(generic.ListView):
     def get_queryset(self):
         uuid = self.kwargs['uuid']
         user = models.CustomUser.objects.get(public_url_uuid=uuid)
-        seen_movies = models.MovieSeen.objects.filter(user=user).values_list('movie__id', flat=True)
-        ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
-        return ordered_movies
+        return models.MovieSeen.objects.filter(user=user).order_by('-score')
 
 
 @login_required
@@ -169,8 +165,10 @@ def compare(request, better_movie_id, worse_movie_id):
         worse_movie=worse_movie,
         user=request.user
     )
-    better_movie.score += 1
-    worse_movie.score -= 1
-    better_movie.save()
-    worse_movie.save()
+    better_movie_seen = models.MovieSeen.get_or_create(user=request.user, movie=better_movie)
+    worse_movie_seen = models.MovieSeen.get_or_create(user=request.user, movie=worse_movie)
+    better_movie_seen[0].score += 1
+    worse_movie_seen[0].score -= 1
+    better_movie_seen[0].save()
+    worse_movie_seen[0].save()
     return redirect(reverse_lazy('rank_movies'))
