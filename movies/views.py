@@ -51,7 +51,7 @@ class SelectMoviesView(LoginRequiredMixin, generic.TemplateView):
             return redirect(reverse_lazy('home'))
         resp = requests.get(API_URL)
         data = resp.json()
-        for row in data['Search']:
+        for row in data.get('Search', []):
             print(row)
             try:
                 try:
