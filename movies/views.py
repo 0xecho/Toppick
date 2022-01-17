@@ -125,7 +125,7 @@ class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
         random.shuffle(shuffled_seen_movies)
         for movie in shuffled_seen_movies:
             remaining_seen_movies = models.MovieSeen.objects.filter(user=self.request.user).filter(
-                Q(id__lt=movie.id) & Q(id__gt=movie.last_checked_movie_index))
+                Q(id__lt=movie.id) & Q(id__gt=movie.last_checked_movie_index)).order_by('id')
             if remaining_seen_movies:
                 kwargs['movies'] = [movie.movie, remaining_seen_movies[0].movie]
                 break
