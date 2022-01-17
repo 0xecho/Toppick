@@ -1,0 +1,18 @@
+{% extends '_base.html' %}
+
+{% block title %}BroadCast Page{% endblock %}
+
+{% block content %}
+<h1>BroadCast Page</h1>
+
+<!-- form, insert message to broadcast -->
+<form method="post">
+    <div class="form-group">
+        {% csrf_token %}
+        <label for="message">Message</label>
+        <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock content %}
