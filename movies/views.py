@@ -1,3 +1,5 @@
+from re import template
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -180,3 +182,24 @@ def compare(request, main_movie_id, other_movie_id, is_main_movie_better):
     main_movie_seen.save()
     other_movie_seen.save()
     return redirect(reverse_lazy('rank_movies'))
+
+class DiscoverMovies(LoginRequiredMixin, generic.ListView):
+    template_name = 'movies/discover_movies.html'
+    
+    def get_queryset(self):
+        # all movies with at least one seen
+        seen_movies = models.MovieSeen.objects.values_list('movie_id', flat=True)
+        all_movies = models.Movie.objects.filter(id__in=seen_movies)
+        return all_movies.exclude(Q(id__in=models.MovieSeen.objects.filter(user=self.request.user).values_list('movie_id', flat=True))|Q(id__in=models.MovieNotSeen.objects.filter(user=self.request.user).values_list('movie_id', flat=True)))
+
+@login_required
+def seen_api(request, movie_id):
+    movie = models.Movie.objects.get(id=movie_id)
+    models.MovieSeen.objects.get_or_create(user=request.user, movie=movie)
+    return JsonResponse({'success': True})
+
+@login_required
+def notseen_api(request, movie_id):
+    movie = models.Movie.objects.get(id=movie_id)
+    models.MovieNotSeen.objects.get_or_create(user=request.user, movie=movie)
+    return JsonResponse({'success': True})

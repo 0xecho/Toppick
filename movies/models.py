@@ -60,3 +60,15 @@ class MovieComparision(models.Model):
 
     def __str__(self):
         return f'{self.better_movie.title} > {self.worse_movie.title}'
+
+class MovieNotSeen(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = [
+            ['user', 'movie']
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} - {self.movie.title}'
