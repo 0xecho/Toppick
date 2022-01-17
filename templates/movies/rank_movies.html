@@ -14,7 +14,7 @@
                     <img src="{{ movies.0.poster }}" alt="Movie 1">
                     <h3>{{movies.0.title}}</h3>
                     <p>Released: {{movies.0.year}}</p>
-                    <a href="{% url 'compare' movies.0.id movies.1.id %}" class="stretched-link"></a>
+                    <a href="{% url 'compare' movies.0.id movies.1.id 1 %}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                     <img src="{{ movies.1.poster }}" alt="Movie 2">
                     <h3>{{movies.1.title}}</h3>
                     <p>Released: {{movies.1.year}}</p>
-                    <a href="{% url 'compare' movies.1.id movies.0.id %}" class="stretched-link"></a>
+                    <a href="{% url 'compare' movies.0.id movies.1.id 0 %}" class="stretched-link"></a>
                 </div>
             </div>
         </div>

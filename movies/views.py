@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from typing import Any, Dict
 from itertools import permutations
 from random_username.generate import generate_username
@@ -14,6 +15,7 @@ import botogram
 
 from . import models
 from .authentication import verify_auth
+import movies
 # Create your views here.
 
 telegram_bot = botogram.create(settings.TELEGRAM_BOT_TOKEN)
@@ -116,21 +118,15 @@ class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'movies/rank_movies.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        # select 2 random movies from table MovieSeen that are not in table MovieComparision and return in context
-        seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
-        seen_movies = list(seen_movies)
-        random.shuffle(seen_movies)
-        kwargs['movies'] = False
-        for movie_1, movie_2 in permutations(seen_movies, 2):
-            if models.MovieComparision.objects.filter(better_movie=movie_1, worse_movie=movie_2).exists() or models.MovieComparision.objects.filter(better_movie=movie_2, worse_movie=movie_1).exists():
-                continue
-            kwargs['movies'] = [models.Movie.objects.get(id=movie_1), models.Movie.objects.get(id=movie_2)]
-            break
+        seen_movies = models.MovieSeen.objects.filter(user=self.request.user).prefetch_related('movie')
+        for movie in seen_movies:
+            remaining_seen_movies = models.MovieSeen.objects.filter(user=self.request.user).filter(
+                Q(id__lt=movie.id) & Q(id__gt=movie.last_checked_movie_index))
+            if remaining_seen_movies:
+                kwargs['movies'] = [movie.movie, remaining_seen_movies[0].movie]
+                break
         return super().get_context_data(**kwargs)
     
-# paginated view
-# seen_movies = models.MovieSeen.objects.filter(user=self.request.user).values_list('movie__id', flat=True)
-# ordered_movies = models.Movie.objects.filter(id__in=seen_movies).order_by('-score')
 class TopRankingsView(LoginRequiredMixin, generic.ListView):
     template_name = 'movies/top_rankings.html'
     paginate_by = 10
@@ -169,18 +165,16 @@ def unsee(request, movie_id):
     return redirect(reverse_lazy('watched_movies'))
 
 @login_required
-def compare(request, better_movie_id, worse_movie_id):
-    better_movie = models.Movie.objects.get(id=better_movie_id)
-    worse_movie = models.Movie.objects.get(id=worse_movie_id)
-    models.MovieComparision.objects.get_or_create(
-        better_movie=better_movie,
-        worse_movie=worse_movie,
-        user=request.user
-    )
-    better_movie_seen = models.MovieSeen.objects.get_or_create(user=request.user, movie=better_movie)
-    worse_movie_seen = models.MovieSeen.objects.get_or_create(user=request.user, movie=worse_movie)
-    better_movie_seen[0].score += 1
-    worse_movie_seen[0].score -= 1
-    better_movie_seen[0].save()
-    worse_movie_seen[0].save()
+def compare(request, main_movie_id, other_movie_id, is_main_movie_better):
+    main_movie_seen = models.MovieSeen.objects.get(user=request.user, movie__id=main_movie_id)
+    other_movie_seen = models.MovieSeen.objects.get(user=request.user, movie__id=other_movie_id)
+    if is_main_movie_better:
+        main_movie_seen.score += 1
+        other_movie_seen.score -= 1
+    else:
+        main_movie_seen.score -= 1
+        other_movie_seen.score += 1
+    main_movie_seen.last_checked_movie_index = other_movie_seen.id
+    main_movie_seen.save()
+    other_movie_seen.save()
     return redirect(reverse_lazy('rank_movies'))

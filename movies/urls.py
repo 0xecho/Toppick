@@ -15,5 +15,5 @@ urlpatterns = [
     path('user/<uuid:uuid>/', views.PublicTopRankingsView.as_view(), name='public_top_movies'),
     path('see/<int:movie_id>', views.see, name='see'),
     path('unsee/<int:movie_id>', views.unsee, name='unsee'),
-    path('compare/<int:better_movie_id>/<int:worse_movie_id>', views.compare, name='compare'),
+    path('compare/<int:main_movie_id>/<int:other_movie_id>/<int:is_main_movie_better>', views.compare, name='compare'),
 ]

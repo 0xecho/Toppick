@@ -26,10 +26,14 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+def get_smallest_movie_id_by_user(user):
+    return MovieSeen.objects.filter(user=user).aggregate(models.Min('movie_id'))['movie_id__min']    
+
 class MovieSeen(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
+    last_checked_movie_index = models.IntegerField(blank=True)
 
     class Meta:
         index_together = [
@@ -38,6 +42,11 @@ class MovieSeen(models.Model):
 
     def __str__(self):
         return self.movie.title
+    
+    def save(self, **kwargs):
+        if not self.pk:
+            self.last_checked_movie_index = get_smallest_movie_id_by_user(self.user) or 0
+        return super().save(**kwargs)
 
 class MovieComparision(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
