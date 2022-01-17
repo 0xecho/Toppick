@@ -119,7 +119,9 @@ class RankMoviesView(LoginRequiredMixin, generic.TemplateView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         seen_movies = models.MovieSeen.objects.filter(user=self.request.user).prefetch_related('movie')
-        for movie in seen_movies:
+        shuffled_seen_movies = list(seen_movies)
+        random.shuffle(shuffled_seen_movies)
+        for movie in shuffled_seen_movies:
             remaining_seen_movies = models.MovieSeen.objects.filter(user=self.request.user).filter(
                 Q(id__lt=movie.id) & Q(id__gt=movie.last_checked_movie_index))
             if remaining_seen_movies:
